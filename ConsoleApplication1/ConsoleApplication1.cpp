@@ -18,13 +18,13 @@ public:
 		sAppName = "ACO";
 	}
 	int nPoints = 4; // How many points? (no more than 99)
-	int nAnts = 2; // How many ants? (no more than 999)
+	int nAnts = 999; // How many ants? (no more than 999)
 
-	olc::vf2d loc[100];
+	olc::vf2d loc[101];
 	Ant bestTour;
-	Ant ant[1000];
-	float length[100][100]; // Length of paths (Heuristic information)
-	float pher[100][100]; // Pheromone
+	Ant ant[1001];
+	float length[101][101]; // Length of paths (Heuristic information)
+	float pher[101][101]; // Pheromone
 	float alpha = 1;
 	float beta = 1;
 	float rho = 0.1;
@@ -46,9 +46,9 @@ public:
 			loc[i].y = rand() % ScreenHeight();
 		}
 		// Setting pheromone state at the start (apparently it was set to 0 but I just do it one more time)
-		for (int i = 1; i <= 100; ++i)
+		for (int i = 1; i <= 99; ++i)
 		{
-			for (int j = 1; j <= 100; ++j)
+			for (int j = 1; j <= 99; ++j)
 			{
 				pher[i][j] = 0;
 			}
@@ -111,7 +111,7 @@ public:
 				ant[a].tour[1] = (rand() % nPoints) + 1;
 				for (int end = 1; end <= nPoints - 1; ++end) // Loop all points
 				{
-					float P[100] = { 0 };
+					float P[101] = { 0 };
 					int i = ant[a].tour[end];
 					float sumP = 0;
 					for (int j = 1; j <= nPoints; ++j) // dealing with matrix
@@ -139,7 +139,7 @@ public:
 				ant[a].cost += length[(ant[a].tour[nPoints])][(ant[a].tour[1])]; // length of the path from the last to the first point (maybe there's another way to implement that)
 				ant[a].tour[nPoints + 1] = ant[a].tour[1]; // copy the first destination to the very end to form a closed tour
 				// Update the best tour so far
-				if (ant[a].cost < bestTour.cost)
+				if (ant[a].cost < bestTour.cost && !duplicate(ant[a].tour))
 				{
 					for (int p = 1; p <= nPoints + 1; ++p)
 					{
@@ -183,11 +183,12 @@ public:
 	}
 
 private:
-	int RouletteWheelSelection(float P[])
+	int RouletteWheelSelection(float *P)
 	{
 		float r = (float)rand()/RAND_MAX;
 		//std::cout << r;
-		float cumsum[100]{0};
+		float cumsum[101]{0};
+		int jnext = 0;
 		for (int j = 1; j <= nPoints; ++j)
 		{
 			for (int n = 1; n <= j; ++n)
@@ -196,9 +197,25 @@ private:
 			}
 			if (cumsum[j] >= r)
 			{
-				return j;
+				jnext = j;
+				break;
 			}
 		}
+		return jnext;
+	}
+	bool duplicate(int tour[])
+	{
+		for (int i = 1; i <= nPoints - 1; ++i)
+		{
+			for (int j = i + 1; j <= nPoints; ++j)
+			{
+				if (tour[i] == tour[j])
+				{
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 };
 

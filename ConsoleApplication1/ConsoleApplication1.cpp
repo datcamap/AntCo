@@ -4,7 +4,7 @@
 struct Ant
 {
 public:
-	int tour[100] = {0};
+	int tour[100] = { 0 };
 	float cost = 0;
 };
 
@@ -17,8 +17,8 @@ public:
 		// Name your application
 		sAppName = "ACO";
 	}
-	int nPoints = 9; // How many points? (no more than 999)
-	int nAnts = 99; // How many ants? (no more than 9999)
+	int nPoints = 4; // How many points? (no more than 99)
+	int nAnts = 2; // How many ants? (no more than 999)
 
 	olc::vf2d loc[100];
 	Ant bestTour;
@@ -46,9 +46,9 @@ public:
 			loc[i].y = rand() % ScreenHeight();
 		}
 		// Setting pheromone state at the start (apparently it was set to 0 but I just do it one more time)
-		for (int i = 1; i <= nPoints; ++i)
+		for (int i = 1; i <= 100; ++i)
 		{
-			for (int j = 1; j <= nPoints; ++j)
+			for (int j = 1; j <= 100; ++j)
 			{
 				pher[i][j] = 0;
 			}
@@ -88,6 +88,7 @@ public:
 				length[j][i] = length[i][j];
 			}
 			added = true;
+			//bestTour = new Ant;
 			bestTour.cost = INFINITY;
 		}
 		if (GetMouse(olc::Mouse::RIGHT).bReleased && added)
@@ -102,14 +103,13 @@ public:
 			{
 				// Unload resouces to make ant happy
 				ant[a].cost = 0;
-				for (int p = 1; p <= nPoints; ++p)
+				for (int p = 1; p <= nPoints + 1; ++p)
 				{
 					ant[a].tour[p] = 0;
 				}
 				// Set ant on a new tour
-				ant[a].tour[1] = rand() % nPoints + 1;
-				int end = 1;
-				for (int p = 2; p <= nPoints; ++p) // Loop all points
+				ant[a].tour[1] = (rand() % nPoints) + 1;
+				for (int end = 1; end <= nPoints - 1; ++end) // Loop all points
 				{
 					float P[100] = { 0 };
 					int i = ant[a].tour[end];
@@ -134,7 +134,6 @@ public:
 					// Chose next path
 					int j = RouletteWheelSelection(P);
 					ant[a].tour[end + 1] = j;
-					++end;
 					ant[a].cost += length[i][j]; // cost is the length of paths
 				}
 				ant[a].cost += length[(ant[a].tour[nPoints])][(ant[a].tour[1])]; // length of the path from the last to the first point (maybe there's another way to implement that)
@@ -195,7 +194,7 @@ private:
 			{
 				cumsum[j] += P[n]; // cumulative sum
 			}
-			if (cumsum[j] > r)
+			if (cumsum[j] >= r)
 			{
 				return j;
 			}

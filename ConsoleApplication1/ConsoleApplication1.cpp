@@ -137,7 +137,7 @@ public:
 					ant[a].cost += length[i][j]; // cost is the length of paths
 				}
 				ant[a].cost += length[(ant[a].tour[nPoints])][(ant[a].tour[1])]; // length of the path from the last to the first point (maybe there's another way to implement that)
-				ant[a].tour[nPoints + 1] = ant[a].tour[1]; // copu the first destination to the very end to form a closed tour
+				ant[a].tour[nPoints + 1] = ant[a].tour[1]; // copy the first destination to the very end to form a closed tour
 				// Update the best tour so far
 				if (ant[a].cost < bestTour.cost)
 				{
